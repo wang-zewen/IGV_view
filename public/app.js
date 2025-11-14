@@ -73,6 +73,18 @@ async function initIGV() {
     try {
         igvBrowser = await igv.createBrowser(igvDiv, options);
         console.log('IGV Browser initialized successfully with genome:', selectedValue);
+
+        // 强制设置 IGV 内部容器的滚动属性
+        setTimeout(() => {
+            const columnContainer = document.querySelector('.igv-column-container');
+            if (columnContainer) {
+                columnContainer.style.overflowY = 'auto';
+                columnContainer.style.overflowX = 'hidden';
+                columnContainer.style.maxHeight = '100%';
+                console.log('IGV column container scroll enabled');
+            }
+        }, 300);
+
         hideInfoBox();
     } catch (error) {
         console.error('Error initializing IGV:', error);
