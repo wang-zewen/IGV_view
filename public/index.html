@@ -45,7 +45,7 @@
         }
 
         .sidebar {
-            width: 320px;
+            width: 280px;
             background: white;
             border-right: 1px solid #e0e0e0;
             display: flex;
@@ -142,7 +142,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 1.5rem;
+            padding: 1rem;
             overflow: hidden;
         }
 
@@ -150,13 +150,15 @@
             flex: 1;
             background: white;
             border-radius: 8px;
-            padding: 1rem;
+            padding: 0.5rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             overflow: hidden;
+            min-height: 0;
         }
 
         #igv-div {
             height: 100%;
+            min-height: 500px;
         }
 
         .info-box {
@@ -289,10 +291,11 @@
             <div class="info-box" id="info-box">
                 <h3>👋 欢迎使用 IGV.js</h3>
                 <p>
-                    1. 从左侧选择参考基因组<br>
+                    1. 从左侧选择参考基因组（支持内置基因组和本地.fa/.fasta文件）<br>
                     2. 点击"刷新文件列表"加载数据文件<br>
                     3. 选择数据文件并点击"添加所选轨道"<br>
-                    4. 使用鼠标拖拽、滚轮缩放查看基因组数据
+                    4. 使用鼠标拖拽、滚轮缩放查看基因组数据<br>
+                    <small>💡 提示：将基因组文件(.fa/.fasta)放入数据目录即可在下拉菜单中使用</small>
                 </p>
             </div>
             <div class="igv-container">

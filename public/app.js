@@ -2,10 +2,12 @@
 let igvBrowser = null;
 let availableFiles = [];
 let selectedFile = null;
+let availableGenomes = [];
 
 // Initialize IGV Browser
 async function initIGV() {
-    const genome = document.getElementById('genome-selector').value;
+    const genomeSelector = document.getElementById('genome-selector');
+    const selectedValue = genomeSelector.value;
 
     if (igvBrowser) {
         // Remove existing browser
@@ -13,19 +15,88 @@ async function initIGV() {
         igvBrowser = null;
     }
 
-    const options = {
-        genome: genome,
-        locus: genome === 'hg38' || genome === 'hg19' ? 'chr1:155,000,000-155,500,000' : 'chr1:1-1000000',
-        tracks: []
-    };
+    let options;
+
+    // Check if this is a custom local genome
+    if (selectedValue.startsWith('custom:')) {
+        const genomePath = selectedValue.replace('custom:', '');
+        const genome = availableGenomes.find(g => g.path === genomePath);
+
+        if (!genome) {
+            showError('未找到所选基因组文件');
+            return;
+        }
+
+        const baseUrl = window.location.origin;
+        const fastaUrl = `${baseUrl}/data/${genome.path}`;
+        const indexUrl = genome.hasIndex ? `${fastaUrl}.fai` : undefined;
+
+        options = {
+            reference: {
+                id: genome.displayName,
+                name: genome.displayName,
+                fastaURL: fastaUrl,
+                indexURL: indexUrl
+            },
+            locus: 'all',
+            tracks: []
+        };
+
+        console.log('Loading custom genome:', genome.displayName);
+    } else {
+        // Use built-in genome
+        options = {
+            genome: selectedValue,
+            locus: selectedValue === 'hg38' || selectedValue === 'hg19' ? 'chr1:155,000,000-155,500,000' : 'chr1:1-1000000',
+            tracks: []
+        };
+
+        console.log('Loading built-in genome:', selectedValue);
+    }
 
     try {
         igvBrowser = await igv.createBrowser(document.getElementById('igv-div'), options);
-        console.log('IGV Browser initialized with genome:', genome);
+        console.log('IGV Browser initialized successfully');
         hideInfoBox();
     } catch (error) {
         console.error('Error initializing IGV:', error);
         showError('初始化 IGV 失败: ' + error.message);
+    }
+}
+
+// Load available genomes from server
+async function loadGenomes() {
+    try {
+        const response = await fetch('/api/genomes');
+        const data = await response.json();
+        availableGenomes = data.genomes;
+
+        // Update genome selector with custom genomes
+        const genomeSelector = document.getElementById('genome-selector');
+
+        // Remove any previously added custom genomes
+        const customOptions = genomeSelector.querySelectorAll('option[data-custom="true"]');
+        customOptions.forEach(opt => opt.remove());
+
+        // Add separator and custom genomes if any exist
+        if (availableGenomes.length > 0) {
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '--- 本地基因组 ---';
+            genomeSelector.appendChild(separator);
+
+            availableGenomes.forEach(genome => {
+                const option = document.createElement('option');
+                option.value = 'custom:' + genome.path;
+                option.textContent = `${genome.displayName}${genome.hasIndex ? '' : ' (无索引)'}`;
+                option.setAttribute('data-custom', 'true');
+                genomeSelector.appendChild(option);
+            });
+
+            console.log(`Found ${availableGenomes.length} custom genome(s)`);
+        }
+    } catch (error) {
+        console.error('Error loading genomes:', error);
     }
 }
 
@@ -40,6 +111,9 @@ async function loadFiles() {
 
         availableFiles = data.files;
         displayFiles(availableFiles);
+
+        // Load available genomes
+        await loadGenomes();
 
         // Initialize IGV if not already done
         if (!igvBrowser) {

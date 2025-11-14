@@ -81,6 +81,39 @@ app.get('/api/files', (req, res) => {
   }
 });
 
+// API endpoint to list available genome files
+app.get('/api/genomes', (req, res) => {
+  try {
+    const files = listFiles(config.dataDir);
+    // Filter for FASTA files (.fa, .fasta)
+    const genomeFiles = files.filter(f =>
+      f.type === 'file' &&
+      (f.name.endsWith('.fa') || f.name.endsWith('.fasta')) &&
+      !f.name.endsWith('.fai')
+    );
+
+    // Check for corresponding .fai index files
+    const genomes = genomeFiles.map(genome => {
+      const indexPath = genome.path + '.fai';
+      const hasIndex = files.some(f => f.path === indexPath);
+      return {
+        name: genome.name,
+        path: genome.path,
+        size: genome.size,
+        hasIndex: hasIndex,
+        displayName: genome.name.replace(/\.(fa|fasta)$/, '')
+      };
+    });
+
+    res.json({
+      genomes: genomes
+    });
+  } catch (err) {
+    console.error('Error listing genomes:', err);
+    res.status(500).json({ error: 'Failed to list genomes' });
+  }
+});
+
 // API endpoint to browse a specific directory
 app.get('/api/browse', (req, res) => {
   const subPath = req.query.path || '';
