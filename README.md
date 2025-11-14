@@ -39,6 +39,9 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 # 加载 nvm
 source ~/.bashrc
 
+# 或者
+source ~/.zshrc
+
 # 安装 Node.js
 nvm install --lts
 ```
@@ -47,7 +50,7 @@ nvm install --lts
 
 ```bash
 # 1. 克隆或下载项目
-git clone <your-repo-url>
+git clone (https://github.com/wang-zewen/IGV_view.git)
 cd IGV_view
 
 # 2. 运行部署脚本
@@ -57,21 +60,21 @@ cd IGV_view
 ./start.sh
 ```
 
-就这么简单！🎉
+就这么简单！🎉 ======== 至此就可以直接使用了
 
 ### 访问界面
 
 部署完成后，在浏览器中打开：
 
 ```
-http://localhost:8080
+http://<your_ip_address>:8080
 ```
 
 如果在远程服务器上部署，可以使用 SSH 端口转发：
 
 ```bash
 # 在本地机器上运行
-ssh -L 8080:localhost:8080 user@remote-server
+ssh -L 8080:localhost:8080 user@server_ip_address
 ```
 
 然后在本地浏览器访问 `http://localhost:8080`
