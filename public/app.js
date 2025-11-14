@@ -47,7 +47,11 @@ async function initIGV() {
                 indexURL: indexUrl
             },
             locus: 'all',
-            tracks: []
+            tracks: [],
+            showNavigation: true,
+            showRuler: true,
+            showCenterGuide: true,
+            showCursorTrackingGuide: true
         };
 
         console.log('Loading custom genome:', genome.displayName, 'from', fastaUrl);
@@ -56,7 +60,11 @@ async function initIGV() {
         options = {
             genome: selectedValue,
             locus: selectedValue === 'hg38' || selectedValue === 'hg19' ? 'chr1:155,000,000-155,500,000' : 'chr1:1-1000000',
-            tracks: []
+            tracks: [],
+            showNavigation: true,
+            showRuler: true,
+            showCenterGuide: true,
+            showCursorTrackingGuide: true
         };
 
         console.log('Loading built-in genome:', selectedValue);
