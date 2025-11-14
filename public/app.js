@@ -9,11 +9,19 @@ async function initIGV() {
     const genomeSelector = document.getElementById('genome-selector');
     const selectedValue = genomeSelector.value;
 
+    // Remove existing browser if present
     if (igvBrowser) {
-        // Remove existing browser
-        igvBrowser.remove();
+        try {
+            igvBrowser.remove();
+        } catch (e) {
+            console.warn('Error removing IGV browser:', e);
+        }
         igvBrowser = null;
     }
+
+    // Clear the IGV container to ensure clean slate
+    const igvDiv = document.getElementById('igv-div');
+    igvDiv.innerHTML = '';
 
     let options;
 
@@ -42,7 +50,7 @@ async function initIGV() {
             tracks: []
         };
 
-        console.log('Loading custom genome:', genome.displayName);
+        console.log('Loading custom genome:', genome.displayName, 'from', fastaUrl);
     } else {
         // Use built-in genome
         options = {
@@ -55,8 +63,8 @@ async function initIGV() {
     }
 
     try {
-        igvBrowser = await igv.createBrowser(document.getElementById('igv-div'), options);
-        console.log('IGV Browser initialized successfully');
+        igvBrowser = await igv.createBrowser(igvDiv, options);
+        console.log('IGV Browser initialized successfully with genome:', selectedValue);
         hideInfoBox();
     } catch (error) {
         console.error('Error initializing IGV:', error);
