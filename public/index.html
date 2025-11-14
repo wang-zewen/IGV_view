@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IGV.js Viewer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/igv@2.15.11/dist/igv.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 0.8rem;
+        }
+
+        .refresh-btn {
+            width: 100%;
+            padding: 0.6rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .file-browser {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .file-item {
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            background: #fafafa;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .file-item:hover {
+            background: #f0f0ff;
+            border-color: #667eea;
+            transform: translateX(2px);
+        }
+
+        .file-item.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .file-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+            word-break: break-all;
+        }
+
+        .file-meta {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        .igv-container {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        #igv-div {
+            height: 100%;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: #1976d2;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 4px;
+            color: #c62828;
+        }
+
+        .genome-select {
+            margin-bottom: 1rem;
+        }
+
+        .genome-select label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .genome-select select {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .track-controls {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .add-track-btn {
+            width: 100%;
+            padding: 0.6rem;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .add-track-btn:hover {
+            background: #45a049;
+        }
+
+        .add-track-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 40%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧬 IGV.js Genomics Viewer</h1>
+        <p>Interactive Genomics Visualization - 基于浏览器的基因组数据查看器</p>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>📁 数据文件</h2>
+                <div class="genome-select">
+                    <label for="genome-selector">参考基因组:</label>
+                    <select id="genome-selector">
+                        <option value="hg38">Human (GRCh38/hg38)</option>
+                        <option value="hg19">Human (GRCh37/hg19)</option>
+                        <option value="mm10">Mouse (GRCm38/mm10)</option>
+                        <option value="mm39">Mouse (GRCm39/mm39)</option>
+                    </select>
+                </div>
+                <button class="refresh-btn" onclick="loadFiles()">🔄 刷新文件列表</button>
+            </div>
+            <div class="file-browser" id="file-browser">
+                <div class="loading">加载中...</div>
+            </div>
+            <div class="track-controls">
+                <button class="add-track-btn" id="add-track-btn" onclick="addSelectedTrack()" disabled>
+                    ➕ 添加所选轨道
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="info-box" id="info-box">
+                <h3>👋 欢迎使用 IGV.js</h3>
+                <p>
+                    1. 从左侧选择参考基因组<br>
+                    2. 点击"刷新文件列表"加载数据文件<br>
+                    3. 选择数据文件并点击"添加所选轨道"<br>
+                    4. 使用鼠标拖拽、滚轮缩放查看基因组数据
+                </p>
+            </div>
+            <div class="igv-container">
+                <div id="igv-div"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/igv@2.15.11/dist/igv.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
