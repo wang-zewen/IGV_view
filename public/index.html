@@ -142,7 +142,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 1rem;
+            padding: 0.5rem;
             overflow: hidden;
         }
 
@@ -150,23 +150,31 @@
             flex: 1;
             background: white;
             border-radius: 8px;
-            padding: 0.5rem;
+            padding: 0.3rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             overflow: hidden;
             min-height: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         #igv-div {
-            height: 100%;
-            min-height: 500px;
+            flex: 1;
+            min-height: 0;
         }
 
         .info-box {
             background: #e3f2fd;
             border-left: 4px solid #2196f3;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
             border-radius: 4px;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        .info-box.visible {
+            display: block;
         }
 
         .info-box h3 {
@@ -190,10 +198,16 @@
         .error {
             background: #ffebee;
             border-left: 4px solid #f44336;
-            padding: 1rem;
-            margin: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
             border-radius: 4px;
             color: #c62828;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        .error.visible {
+            display: block;
         }
 
         .genome-select {
@@ -288,7 +302,7 @@
         </div>
 
         <div class="main-content">
-            <div class="info-box" id="info-box">
+            <div class="info-box visible" id="info-box">
                 <h3>👋 欢迎使用 IGV.js</h3>
                 <p>
                     1. 从左侧选择参考基因组（支持内置基因组和本地.fa/.fasta文件）<br>

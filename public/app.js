@@ -314,28 +314,26 @@ function createTrackConfig(file) {
 // Show error message
 function showError(message) {
     const infoBox = document.getElementById('info-box');
-    infoBox.className = 'error';
+    infoBox.className = 'error visible';
     infoBox.innerHTML = `<strong>错误:</strong> ${message}`;
-    infoBox.style.display = 'block';
 }
 
 // Show success message
 function showMessage(message) {
     const infoBox = document.getElementById('info-box');
-    infoBox.className = 'info-box';
+    infoBox.className = 'info-box visible';
     infoBox.innerHTML = `<p>✓ ${message}</p>`;
-    infoBox.style.display = 'block';
 
     // Hide after 3 seconds
     setTimeout(() => {
-        infoBox.style.display = 'none';
+        infoBox.classList.remove('visible');
     }, 3000);
 }
 
 // Hide info box
 function hideInfoBox() {
     const infoBox = document.getElementById('info-box');
-    infoBox.style.display = 'none';
+    infoBox.classList.remove('visible');
 }
 
 // Handle genome change
